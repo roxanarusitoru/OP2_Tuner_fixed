@@ -198,6 +198,7 @@ for line in new_lines:
           break;
 
 loopIndex = -1;
+found = 0;
 for loop in op_par_loop_relevant_lines:
   for comp in loop:
     comp = comp.strip();
@@ -225,59 +226,62 @@ for loop in op_par_loop_relevant_lines:
         temp_comp.pop(0);
         temp_comp.pop(0);
     elif "op_arg_dat" in comp:
-      temp_comp = comp.split("op_arg_dat(");
-      temp_comp = temp_comp.pop();
-      temp_comp = temp_comp.split(",");
-      temp_comp[5] = temp_comp[5].replace(')','');
-      temp_comp[5] = temp_comp[5].replace(';','');
-      new_op_arg_dat = { 'name' : temp_comp.pop(0),
-                         'access' : temp_comp.pop(0),
-                         'indir_array' : temp_comp.pop(0),
-                         'indir_array_access' : temp_comp.pop(0),
-                         'type' : temp_comp.pop(0),
-                         'operation_type' : temp_comp.pop(0)
-                       };
-      found = 0;
-      #for arg in op_par_loops[op_par_loop_relevant_lines.index(loop)]['op_arg_dat']:
-      for arg in op_par_loops[loopIndex]['op_arg_dat']:
-        if arg == new_op_arg_dat:
-          found = 1;
       if not found:
-        #op_par_loops[op_par_loop_relevant_lines.index(loop)]['op_arg_dat'].append(new_op_arg_dat);
-        op_par_loops[loopIndex]['op_arg_dat'].append(new_op_arg_dat);
+        temp_comp = comp.split("op_arg_dat(");
+        temp_comp = temp_comp.pop();
+        temp_comp = temp_comp.split(",");
+        temp_comp[5] = temp_comp[5].replace(')','');
+        temp_comp[5] = temp_comp[5].replace(';','');
+        new_op_arg_dat = { 'name' : temp_comp.pop(0),
+                           'access' : temp_comp.pop(0),
+                           'indir_array' : temp_comp.pop(0),
+                           'indir_array_access' : temp_comp.pop(0),
+                           'type' : temp_comp.pop(0),
+                           'operation_type' : temp_comp.pop(0)
+                         };
+        found_dat = 0;
+        #for arg in op_par_loops[op_par_loop_relevant_lines.index(loop)]['op_arg_dat']:
+        for arg in op_par_loops[loopIndex]['op_arg_dat']:
+          if arg == new_op_arg_dat:
+            found_dat = 1;
+        if not found_dat:
+          #op_par_loops[op_par_loop_relevant_lines.index(loop)]['op_arg_dat'].append(new_op_arg_dat);
+          op_par_loops[loopIndex]['op_arg_dat'].append(new_op_arg_dat);
     elif "op_arg_gbl" in comp:
-      temp_comp = comp.split("op_arg_gbl(");
-      temp_comp = temp_comp.pop();
-      temp_comp = temp_comp.split(",");
-      temp_comp[3] = temp_comp[3].replace(')','');
-      temp_comp[3] = temp_comp[3].replace(';','');  
-      temp_comp[0] = temp_comp[0].replace('&','');
-      new_op_arg_gbl = { 'name' : temp_comp.pop(0),
-                         'dimension' : temp_comp.pop(0),
-                         'type' : temp_comp.pop(0),
-                         'operation_type' : temp_comp.pop(0)
-                       };
-      found = 0;
-      #for gbl_arg in op_par_loops[op_par_loop_relevant_lines.index(loop)]['op_arg_gbl']:
-      for gbl_arg in op_par_loops[loopIndex]['op_arg_gbl']:
-        if gbl_arg == new_op_arg_gbl:
-          found = 1;
       if not found:
-        op_par_loops[loopIndex]['op_arg_gbl'].append(new_op_arg_gbl);
-        #op_par_loops[op_par_loop_relevant_lines.index(loop)]['op_arg_gbl'].append(new_op_arg_gbl);
+        temp_comp = comp.split("op_arg_gbl(");
+        temp_comp = temp_comp.pop();
+        temp_comp = temp_comp.split(",");
+        temp_comp[3] = temp_comp[3].replace(')','');
+        temp_comp[3] = temp_comp[3].replace(';','');  
+        temp_comp[0] = temp_comp[0].replace('&','');
+        new_op_arg_gbl = { 'name' : temp_comp.pop(0),
+                           'dimension' : temp_comp.pop(0),
+                           'type' : temp_comp.pop(0),
+                           'operation_type' : temp_comp.pop(0)
+                         };
+        found_arg = 0;
+        #for gbl_arg in op_par_loops[op_par_loop_relevant_lines.index(loop)]['op_arg_gbl']:
+        for gbl_arg in op_par_loops[loopIndex]['op_arg_gbl']:
+          if gbl_arg == new_op_arg_gbl:
+            found_arg = 1;
+        if not found_arg:
+          op_par_loops[loopIndex]['op_arg_gbl'].append(new_op_arg_gbl);
+          #op_par_loops[op_par_loop_relevant_lines.index(loop)]['op_arg_gbl'].append(new_op_arg_gbl);
     else:
-      # this is the tuner argument
-      temp_comp = comp;
-      temp_comp = temp_comp.replace(');','');
-      found = 0;
-      #for tuner in op_par_loops[op_par_loop_relevant_lines.index(loop)]['tuner']:
-      for tuner in op_par_loops[loopIndex]['tuner']:
-        if tuner['name'] == temp_comp:
-          found = 1;
       if not found:
-        #op_par_loops[op_par_loop_relevant_lines.index(loop)]['tuner'].append({  'name' : temp_comp
-        #                                                                   });
-        op_par_loops[loopIndex]['tuner'].append({'name' : temp_comp });
+        # this is the tuner argument
+        temp_comp = comp;
+        temp_comp = temp_comp.replace(');','');
+        found_tuner = 0;
+        #for tuner in op_par_loops[op_par_loop_relevant_lines.index(loop)]['tuner']:
+        for tuner in op_par_loops[loopIndex]['tuner']:
+          if tuner['name'] == temp_comp:
+            found_tuner = 1;
+        if not found_tuner:
+          #op_par_loops[op_par_loop_relevant_lines.index(loop)]['tuner'].append({  'name' : temp_comp
+          #                                                                   });
+          op_par_loops[loopIndex]['tuner'].append({'name' : temp_comp });
 
 #activate appropriate tuners
 for loop_tuner in loop_tuners:
@@ -379,6 +383,7 @@ for line in core_lines:
       new_name='';
       for comp in line_comp:
         if '"' in comp:
+          comp = comp.strip();
           comp = comp.strip('"');
           new_name = comp;
       opParLoopNameMap.append({'original' : new_name, 'tag' : new_name + str(indexOpParLoops)});
@@ -432,7 +437,7 @@ for index in range(len(loops_in_order)-1):
 #print fusable_pairs;
 #print loops_in_order;
 #print op_par_loops;
-
+#print opParLoopNameMap;
 #revert naming of fusable loops to original
 tagged_fusable_pairs = copy.deepcopy(fusable_pairs);
 fusable_pairs = [];
@@ -479,8 +484,8 @@ CBRCase1 =  {
 CBRSolution1 =  {
                 'loops_to_fuse' : [],
                 'op_warpsize' : 1,
-                'block_size' : 4,
-                'part_size' : 4
+                'block_size' : 32,
+                'part_size' : 256
                 }
 
 CBRCase2 = copy.deepcopy(CBRCase1);
@@ -489,8 +494,8 @@ CBRCase2['arch'] = Arch.GPU;
 CBRSolution2 =  {
                 'loops_to_fuse' : [],
                 'op_warpsize' : 32,
-                'block_size' : 256,
-                'part_size' : 256
+                'block_size' : 512,
+                'part_size' : 512
                 }
 
 CBRCase3 =  copy.deepcopy(CBRCase1);
@@ -598,6 +603,14 @@ def calculateLoopFusionComplexity(loop1, loop2, arch):
           noOfSameDatAndArrayCases += 1;
   propSimilarArgsLoop1 = noOfSameDatAndArrayCases/len(loop1['op_arg_dat']);
   propSimilarArgsLoop2 = noOfSameDatAndArrayCases/len(loop2['op_arg_dat']);
+#  print "START";
+#  print loop1['op_arg_dat'];
+#  print len(loop1['op_arg_dat']);
+#  print len(loop2['op_arg_dat']);
+#  print len(loop1['op_arg_dat']);
+#  print len(loop2['op_arg_dat']);
+#  print noOfEqualArgs;
+#  print noOfSameDatAndArrayCases;
   propDiffArgsLoop1 = (len(loop1['op_arg_dat']) - (noOfEqualArgs + noOfSameDatAndArrayCases))/len(loop1['op_arg_dat']);
   propDiffArgsLoop2 = (len(loop2['op_arg_dat']) - (noOfEqualArgs + noOfSameDatAndArrayCases))/len(loop2['op_arg_dat']);
   if arch == Arch.CPU:
@@ -610,6 +623,11 @@ def calculateLoopFusionComplexity(loop1, loop2, arch):
     similarArgsWeighting = 5;
     differentArgsWeighting = -0.2;
     noOfArgsWeighting = -0.2;
+#  print propEqualArgsLoop1 + propEqualArgsLoop2;
+#  print propSimilarArgsLoop1 + propSimilarArgsLoop2;
+#  print propDiffArgsLoop1;
+#  print propDiffArgsLoop2;
+#  print propDiffArgsLoop1 + propDiffArgsLoop2;
   complexity += (propEqualArgsLoop1 + propEqualArgsLoop2) *sameArgsWeighting * noOfEqualArgs + (
                 (propSimilarArgsLoop1 + propSimilarArgsLoop2) * similarArgsWeighting * noOfSameDatAndArrayCases) + ( 
                 (propDiffArgsLoop1 + propDiffArgsLoop2) * differentArgsWeighting * (totalNoOfArgs - (noOfEqualArgs + noOfSameDatAndArrayCases))) + ( 
@@ -682,14 +700,14 @@ def similarityEstimation(CBRSystem, unmatchedCase):
     weightedProperties[index][CBRSystem[index]['case']['arch']] += archWeight * CBRSystem[index]['occurances'];
     weightedProperties[index][4] += fusableLoopsWeighting(CBRSystem[index]['case']) * CBRSystem[index]['occurances'];
     weightedProperties[index][5] += opDatArgsWeighting(CBRSystem[index]['case']) * CBRSystem[index]['occurances'];
-  print weightedProperties; 
+  #print weightedProperties; 
 
   # normalize results
   for index in range(len(CBRSystem)):
     for prop in range(noOfProperties):
       weightedProperties[index][prop] /= sum(weightedProperties[index]);
 
-  print weightedProperties;
+  #print weightedProperties;
   # here calculate the weight of the intersection
     
   noOfIntersectingProperties = 3;
@@ -747,7 +765,7 @@ def checkBestMatch(CBRSystem, newCase, bestMatch):
   wantedFusion = None;  
   for pair in newCase['case']['fusable_pairs']:
     loop1 = getLoopInfo(pair['loop1'], newCase['case']['op_par_loops']);
-    loop2 = getLoopInfo(pair['loop2'], newCase['case']['op_par_loops']); 
+    loop2 = getLoopInfo(pair['loop2'], newCase['case']['op_par_loops']);
     if opParLoopArrayMatch(loop1, loop2):
       complexity =  calculateLoopFusionComplexity(loop1, loop2, CBRCase['arch'])
       fusionComplexity =  {
@@ -783,7 +801,7 @@ def checkBestMatch(CBRSystem, newCase, bestMatch):
         if newCase['case']['arch'] == Arch.CPU and bestMatch['solution']['op_warpsize'] == 1:
           return [True, bestMatch];
   # else, we clearly have a better case, so we shall create a new best case
-  
+  print loopFusionComplexity;
   op_warpsize = 1;
   if newCase['case']['arch'] == Arch.GPU:
     op_warpsize = 32;
@@ -802,12 +820,16 @@ def checkBestMatch(CBRSystem, newCase, bestMatch):
   
   temp_block_size = 128;
   temp_part_size = 128;
-  referenceValue = 256;
-  adjustmentFactor = 16;
+  referenceValue = 8;
+  adjustmentFactorCPU = 8;
+  adjustmentFactorOther = 32;
+  print overallMaxComplexity;
   if newCase['case']['arch'] == Arch.CPU:
-    temp_block_size =  1/overallMaxComplexity * referenceValue * adjustmentFactor;
+    #temp_block_size =  1/overallMaxComplexity * referenceValue * adjustmentFactor;
+    temp_block_size = 1/math.log(overallMaxComplexity) * referenceValue * adjustmentFactorCPU;
   else:
-    temp_block_size = overallMaxComplexity/2 * referenceValue;
+    #temp_block_size = overallMaxComplexity/2 * referenceValue;
+    temp_block_size = math.log(overallMaxComplexity) * referenceValue * adjustmentFactorOther;
 
   diffArray = [];
   for val in possible_values_blk_part_size:
@@ -815,11 +837,15 @@ def checkBestMatch(CBRSystem, newCase, bestMatch):
   minDiff = min(diffArray);
   for index in range(len(possible_values_blk_part_size)):
     if (diffArray[index] == minDiff):
-      temp_block_size = possible_values_blk_part_size[index];
-  if overallMaxComplexity >= complexityThresholdForDiffValuePartBlkSize or temp_block_size < 512:
-    temp_part_size = temp_block_size;
+      temp_block_size = possible_values_blk_part_size[index]; 
+  if overallMaxComplexity < complexityThresholdForDiffValuePartBlkSize and temp_block_size *4 <= 512:
+    temp_part_size = 4 * temp_block_size;
+  elif temp_block_size * 8 <= 512:
+    temp_part_size = 8 * temp_block_size; 
+  elif temp_block_size < 512:
+    temp_part_size = 2 * temp_block_size;
   else:
-    temp_part_size = 2 * temp_block_size; 
+    temp_part_size = temp_block_size;
  
   newSolution = {
                 'loops_to_fuse' : wantedFusion,
