@@ -820,16 +820,22 @@ def checkBestMatch(CBRSystem, newCase, bestMatch):
   
   temp_block_size = 128;
   temp_part_size = 128;
-  referenceValue = 8;
+  #referenceValue = 8;
+  referenceValue = 4;
   adjustmentFactorCPU = 8;
+  #adjustmentFactorCPU = 16;
   adjustmentFactorOther = 32;
   print overallMaxComplexity;
   if newCase['case']['arch'] == Arch.CPU:
     #temp_block_size =  1/overallMaxComplexity * referenceValue * adjustmentFactor;
-    temp_block_size = 1/math.log(overallMaxComplexity) * referenceValue * adjustmentFactorCPU;
+    #temp_block_size = 1/math.log(overallMaxComplexity) * referenceValue * adjustmentFactorCPU;
+    #temp_block_size = 1/math.log(overallMaxComplexity * 4) * referenceValue * adjustmentFactorCPU;
+    temp_block_size = math.log(overallMaxComplexity * referenceValue) * adjustmentFactorCPU;
   else:
     #temp_block_size = overallMaxComplexity/2 * referenceValue;
-    temp_block_size = math.log(overallMaxComplexity) * referenceValue * adjustmentFactorOther;
+    #temp_block_size = math.log(overallMaxComplexity) * referenceValue * adjustmentFactorOther;
+    #temp_block_size = math.log(overallMaxComplexity * 4) * referenceValue * adjustmentFactorOther;
+    temp_block_size = math.log(overallMaxComplexity * referenceValue) * adjustmentFactorOther;
 
   diffArray = [];
   for val in possible_values_blk_part_size:
