@@ -45,7 +45,6 @@ loop_tuners = [];
 op_par_loops = [];
 default_arch = Arch.CPU;
 default_file = 'airfoil.cpp';
-userKernelInfo = [];
 
 #possible param values
 possible_values_blk_part_size = [4, 8, 16, 32, 64, 128, 256, 512];  
@@ -64,22 +63,6 @@ if len(sys.argv) > 1:
         default_arch = Arch.ANY;
   if len(sys.argv) > 2:
     default_file = sys.argv[2];
-  if len(sys.argv) > 3:
-    temp_userKernelInfo = sys.argv[3];
-
-# parse the user kernel info
-
-if len(temp_userKernelInfo):
-  kernels = str.split(temp_userKernelInfo, ",");
-  for kernel in kernels:
-    temp_kernel_info = str.split(kernel, ":");
-    temp_kernel_info[0] = temp_kernel_info[0].strip();
-    temp_kernel_info[1] = temp_kernel_info[1].strip();
-    userKernelInfo.append({'loop':temp_kernel_info[0], 'operations':int(temp_kernel_info[1])});
-else:
-  print "Please provide the number of user kernel operations for each distinct associated loop in the format: loop_name:no_of_operations, separated by comma." 
-  exit(-1);
-print userKernelInfo;
 
 # parsing the airfoil file
 airfoil_file = open(default_file,'r');
@@ -535,12 +518,6 @@ def retrieveTrainingData():
 
 betterMatchFound = False;
 
-def getNoOperationsLoop(loop_name):
-  for kernel in userKernelInfo:
-    if kernel['loop'] == loop_name:
-      return kernel['operations'];
-  return None;
-
 def checkResult(solvedCase):
   #[correctlyIdentified, fusions, parms];
   return [True, [], None];  
@@ -636,46 +613,32 @@ def calculateLoopFusionComplexity(loop1, loop2, arch):
 #  print noOfSameDatAndArrayCases;
   propDiffArgsLoop1 = (len(loop1['op_arg_dat']) - (noOfEqualArgs + noOfSameDatAndArrayCases))/len(loop1['op_arg_dat']);
   propDiffArgsLoop2 = (len(loop2['op_arg_dat']) - (noOfEqualArgs + noOfSameDatAndArrayCases))/len(loop2['op_arg_dat']);
-  noOperationsLoop1 = getNoOperationsLoop(loop1['loop_name']);
-  noOperationsLoop2 = getNoOperationsLoop(loop2['loop_name']);
   if arch == Arch.CPU:
-    #sameArgsWeighting = 12;
-    #similarArgsWeighting = 5;
-    ##differentArgsWeighting = -0.5;
-    #differentArgsWeighting = -0.1;
-    #noOfArgsWeighting = -1;
-    #noOperationsWeighting = -0.07;
-    sameArgsWeighting = 6;
-    similarArgsWeighting = 4;
-    differentArgsWeighting = -0.06;
-    noOfArgsWeighting = -1.05;
-    noOperationsWeighting = -0.01;
-  else:
-    sameArgsWeighting = 9;
+    sameArgsWeighting = 10;
     similarArgsWeighting = 5;
-    #differentArgsWeighting = -0.5;
-    differentArgsWeighting = -0.15;
-    noOfArgsWeighting = -0.3;
-    noOperationsWeighting = -0.1;
-#  maxOverlapProp = max(propEqualArgsLoop1, propEqualArgsLoop2);
+    differentArgsWeighting = -0.5;
+    noOfArgsWeighting = -0.1;
+    overlapWeighting = 5;
+  else: 
+    sameArgsWeighting = 10;
+    similarArgsWeighting = 5;
+    differentArgsWeighting = -0.5;
+    noOfArgsWeighting = -0.2;
+    overlapWeighting = 5;
+  maxOverlapProp = max(propEqualArgsLoop1, propEqualArgsLoop2);
   print "START";
   print propEqualArgsLoop1 + propEqualArgsLoop2;
-#  print propSimilarArgsLoop1 + propSimilarArgsLoop2;
-#  print propDiffArgsLoop1;
-#  print propDiffArgsLoop2;
-#  print propDiffArgsLoop1 + propDiffArgsLoop2;
-#  print maxOverlapProp;
-  print totalNoOfArgs-noOfEqualArgs;
-  complexity += (noOperationsLoop1 + noOperationsLoop2) * noOperationsWeighting + (
-                #(propEqualArgsLoop1 + propEqualArgsLoop2) *sameArgsWeighting * noOfEqualArgs) + (
-                (propEqualArgsLoop1 + propEqualArgsLoop2) * sameArgsWeighting) + (
+  print propSimilarArgsLoop1 + propSimilarArgsLoop2;
+  print propDiffArgsLoop1;
+  print propDiffArgsLoop2;
+  print propDiffArgsLoop1 + propDiffArgsLoop2;
+  print maxOverlapProp;
+  complexity += maxOverlapProp * overlapWeighting + (
+                (propEqualArgsLoop1 + propEqualArgsLoop2) *sameArgsWeighting * noOfEqualArgs) + (
                 (propSimilarArgsLoop1 + propSimilarArgsLoop2) * similarArgsWeighting * noOfSameDatAndArrayCases) + ( 
                 (propDiffArgsLoop1 + propDiffArgsLoop2) * differentArgsWeighting * (totalNoOfArgs - (noOfEqualArgs + noOfSameDatAndArrayCases))) + ( 
-                (totalNoOfArgs - noOfEqualArgs) * noOfArgsWeighting);
-  scalingFactor = 23;
-#  scalingFactor = 0;
-  scaledBy = 1/math.fabs(complexity) * scalingFactor;
-  return complexity + scaledBy;
+                totalNoOfArgs * noOfArgsWeighting);
+  return complexity;
   
 def opDatArgsWeighting(CBRCase):
   weighting = 0;
@@ -810,7 +773,7 @@ def checkBestMatch(CBRSystem, newCase, bestMatch):
     loop1 = getLoopInfo(pair['loop1'], newCase['case']['op_par_loops']);
     loop2 = getLoopInfo(pair['loop2'], newCase['case']['op_par_loops']);
     if opParLoopArrayMatch(loop1, loop2):
-      complexity =  calculateLoopFusionComplexity(loop1, loop2, newCase['case']['arch'])
+      complexity =  calculateLoopFusionComplexity(loop1, loop2, CBRCase['arch'])
       fusionComplexity =  {
                           'fusion' : pair,
                           'complexity' : complexity
