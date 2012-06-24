@@ -525,11 +525,11 @@ CBRCase4['arch'] = Arch.ACCELERATOR;
 
 CBRSolution4 = copy.deepcopy(CBRSolution1);
 
-trainingCases = [CBRCase1, CBRCase2, CBRCase1, CBRCase3, CBRCase4];
-results = [CBRSolution1, CBRSolution2, CBRSolution1, CBRSolution3, CBRSolution4];
+#trainingCases = [CBRCase1, CBRCase2, CBRCase1, CBRCase3, CBRCase4];
+#results = [CBRSolution1, CBRSolution2, CBRSolution1, CBRSolution3, CBRSolution4];
 
-#trainingCases = [CBRCase2, CBRCase3, CBRCase4];
-#results = [CBRSolution2, CBRSolution3, CBRSolution4];
+trainingCases = [CBRCase2, CBRCase3, CBRCase4];
+results = [CBRSolution2, CBRSolution3, CBRSolution4];
 
 def retrieveTrainingData():
   return [trainingCases, results];
@@ -799,10 +799,9 @@ def similarityEstimation(CBRSystem, unmatchedCase):
 
 def bestCaseMatch(CBRSystem, unmatchedCase):
   tempCase = caseLookup(CBRSystem, unmatchedCase);
-  
+ 
   if tempCase == None or not equals(tempCase, unmatchedCase):
     tempCase = similarityEstimation(CBRSystem, unmatchedCase); 
- 
   return tempCase;
 
 def checkBestMatch(CBRSystem, newCase, bestMatch):
@@ -835,7 +834,7 @@ def checkBestMatch(CBRSystem, newCase, bestMatch):
       loopsToFuse = bestMatch['solution']['loops_to_fuse']; 
       if newCase['case']['arch'] == Arch.CPU and bestMatch['solution']['op_warpsize'] == 1 and loopsToFuse.index(wantedFusion) != -1:
         return [True, bestMatch];
-  else:   
+  else:  
     # we have no loop fusions
     if bestMatch != None and checkComparable(newCase['case'], bestMatch['case']):
       if newCase['case']['arch'] == Arch.CPU and bestMatch['solution']['op_warpsize'] == 1 and len(bestMatch['solution']['loops_to_fuse']) == 0: 
@@ -909,7 +908,7 @@ def checkBestMatch(CBRSystem, newCase, bestMatch):
 
 def retrieve(CBRSystem, newCase):
   bestMatch =  bestCaseMatch(CBRSystem, newCase);
-
+  print bestMatch;
   # failsafe no 1 - we need to see if this is really a good option.
   # this situation might have not been encountered
   [betterMatchFound, betterMatch] = checkBestMatch(CBRSystem, newCase, bestMatch);
