@@ -2,3 +2,5 @@ python tuner.py CPU airfoil_fusable4.cpp save_soln:4,update:13,fusedOne:85,fused
 
 python tuner.py.experimental CPU airfoil.cpp save_soln:4,update:13,fusedOne:85,fusedTwo:94,fusedThree:17,adt_calc:81,bres_calc:88,res_calc:96
 
+python tuner.py.demo CPU airfoil.cpp save_soln:4,update:13,fusedOne:85,fusedTwo:94,fusedThree:17,adt_calc:81,bres_calc:88,res_calc:96
+
